@@ -154,10 +154,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
          outputText = Double.toString(Double.parseDouble(valueOne) / Double.parseDouble(valueTwo));
       }
       valueOne = outputText;
+      System.out.println(outputText);
       valueTwo = "";
       operator = "";
       outputWindow.setText(outputText);
-      outputText = "";
    }
    
    // called if the user enters one of the numbers
