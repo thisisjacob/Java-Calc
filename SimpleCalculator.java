@@ -16,6 +16,8 @@ public class SimpleCalculator extends JFrame implements ActionListener
    private String operator = "";
    private String valueTwo = "";
    private String outputText = "";
+   
+   private SimpleCalculatorActionPerformedMethods actionMethods = new SimpleCalculatorActionPerformedMethods();
 
    
    public static void main(String[] args)
@@ -43,22 +45,22 @@ public class SimpleCalculator extends JFrame implements ActionListener
       // the bottom section of the calculator, holds all the buttons in a grid for the user to interact with
       JPanel buttonPanel = new JPanel();
       buttonPanel.setLayout(new GridLayout(4, 4));
-      JButton one = createButton("1");
-      JButton two = createButton("2");
-      JButton three = createButton("3");
-      JButton divide = createButton("/");
-      JButton four = createButton("4");
-      JButton five = createButton("5");
-      JButton six = createButton("6");
-      JButton multiply = createButton("*");
-      JButton seven = createButton("7");
-      JButton eight = createButton("9");
-      JButton nine = createButton("9");
-      JButton subtract = createButton("-");
-      JButton clear = createButton("C");
-      JButton zero = createButton("0");
-      JButton equals = createButton("=");
-      JButton sum = createButton("+");
+      JButton one = new JButton("1");
+      JButton two = new JButton("2");
+      JButton three = new JButton("3");
+      JButton divide = new JButton("/");
+      JButton four = new JButton("4");
+      JButton five = new JButton("5");
+      JButton six = new JButton("6");
+      JButton multiply = new JButton("*");
+      JButton seven = new JButton("7");
+      JButton eight = new JButton("9");
+      JButton nine = new JButton("9");
+      JButton subtract = new JButton("-");
+      JButton clear = new JButton("C");
+      JButton zero = new JButton("0");
+      JButton equals = new JButton("=");
+      JButton sum = new JButton("+");
       
       // attaches actionListeners to all the buttons
       one.addActionListener(this);
@@ -79,7 +81,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       sum.addActionListener(this);
       
       
-      // adds buttons to buttonPanel
+      // adds the buttons to buttonPanel
       buttonPanel.add(one);
       buttonPanel.add(two);
       buttonPanel.add(three);
@@ -105,86 +107,18 @@ public class SimpleCalculator extends JFrame implements ActionListener
       calcWindow.setVisible(true);
    }
    
-   public JButton createButton(String buttonText)
-   {
-      JButton tempButton = new JButton(buttonText);
-      return tempButton;
    
-   }
-   
-   // if action event recieves a command for clearing the calculator
-   // then all the variables for holding information and the text output
-   // are set to be blank
-   private void actionPerformedClear(ActionEvent givenE)
-   {
-      valueOne = "";
-      operator = "";
-      valueTwo = "";
-      outputText = "";
-      outputWindow.setText("");
-   }
-   
-   // if an operator (other than =) is entered, this records the operator and updates the output text to the user
-   public void actionPerformedOperator (ActionEvent givenE)
-   {
-      // if (operator != "") // second operator 
-      operator = givenE.getActionCommand();
-      outputText = outputText + "  " + givenE.getActionCommand() + "  ";
-      outputWindow.setText(outputText);
-   }
-   
-   // if the user enters = (equals), the calculation is performed and the output is updated with its results,
-   // valueOne is given the result if further calculation on the result is needed, and the other calculation variables are set to blank
-   public void actionPerformedFindResult()
-   {
-      if (operator == "+")
-      {
-         outputText = Double.toString(Double.parseDouble(valueOne) + Double.parseDouble(valueTwo));
-      }
-      else if (operator == "-")
-      {
-         outputText = Double.toString(Double.parseDouble(valueOne) - Double.parseDouble(valueTwo));
-      }
-      else if (operator == "*")
-      {
-         outputText = Double.toString(Double.parseDouble(valueOne) * Double.parseDouble(valueTwo));
-      }
-      else 
-      {
-         outputText = Double.toString(Double.parseDouble(valueOne) / Double.parseDouble(valueTwo));
-      }
-      valueOne = outputText;
-      System.out.println(outputText);
-      valueTwo = "";
-      operator = "";
-      outputWindow.setText(outputText);
-   }
-   
-   // called if the user enters one of the numbers
-   // if there is no operator entered yet, a String of the number is appended to the valueOne string
-   // otherwise it is appended to the valueTwo string   
-   public void actionPerformedBuildValues (ActionEvent givenE)
-   {
-      if (operator == "")
-      {
-         valueOne = valueOne + givenE.getActionCommand(); // remembers value of first behind the scenes
-         outputText = outputText + givenE.getActionCommand();
-         outputWindow.setText(outputText);
-      }
-      else
-      {
-         valueTwo = valueTwo + givenE.getActionCommand();
-         outputText = outputText + givenE.getActionCommand();
-         outputWindow.setText(outputText);
-      }
-   }
-   
-   // for responding to user input
+   // This section is for listening to and responding to user input
+   // Includes the function actionPerformed (which is the actionListener for this program)
+   // Includes the private class SimpleCalculatorActionPerformedMethods which holds the methods used
+   // in the actionPerformed method 
+      
+   // The actionListener for this program, responds to user input (press of the calculator buttons)
    public void actionPerformed(ActionEvent e)
    {
       if (e.getActionCommand() == "C") // clear command used, outputWindow text and all calculation variables reset
       {
-         actionPerformedClear(e);
+         actionMethods.actionPerformedClear(e);
       }  
       else if ((e.getActionCommand() == "/") || // records use of operator, stores what operator was chosen
           (e.getActionCommand() == "*") ||
@@ -193,19 +127,98 @@ public class SimpleCalculator extends JFrame implements ActionListener
       {
          if (valueTwo == "")
          {
-            actionPerformedOperator(e);
+            actionMethods.actionPerformedOperator(e);
          }
       }
-
+    
       else if (e.getActionCommand() == "=") // equals, performs the calculation
       {
-         actionPerformedFindResult();
+         actionMethods.actionPerformedFindResult();
       }
       else  // operator not yet used or clear has been activated, builds up integer as a String
       {
-         actionPerformedBuildValues(e);
+         actionMethods.actionPerformedBuildValues(e);
+      }
+         
+      
+   }
+   
+   // A class that holds all the methods that are to be used in actionPerformed
+   private class SimpleCalculatorActionPerformedMethods
+   {
+      // if action event recieves a command for clearing the calculator
+      // then all the variables for holding information and the text output
+      // are set to be blank
+      private void actionPerformedClear(ActionEvent givenE)
+      {
+         valueOne = "";
+         operator = "";
+         valueTwo = "";
+         outputText = "";
+         outputWindow.setText("");
       }
       
-   
+      // if an operator (other than =) is entered, this records the operator and updates the output text to the user
+      public void actionPerformedOperator (ActionEvent givenE)
+      {
+         // if (operator != "") // second operator 
+         operator = givenE.getActionCommand();
+         outputText = outputText + "  " + givenE.getActionCommand() + "  ";
+         outputWindow.setText(outputText);
+      }
+      
+      // if the user enters = (equals), the calculation is performed and the output is updated with its results,
+      // valueOne is given the result if further calculation on the result is needed, and the other calculation variables are set to blank
+      public void actionPerformedFindResult()
+      {
+         if (operator == "+")
+         {
+            outputText = Double.toString(Double.parseDouble(valueOne) + Double.parseDouble(valueTwo));
+         }
+         else if (operator == "-")
+         {
+            outputText = Double.toString(Double.parseDouble(valueOne) - Double.parseDouble(valueTwo));
+         }
+         else if (operator == "*")
+         {
+            outputText = Double.toString(Double.parseDouble(valueOne) * Double.parseDouble(valueTwo));
+         }
+         else if (operator == "/")
+         {
+            if (Double.parseDouble(valueTwo) == 0)
+            {
+               outputText = "Division by 0";
+            }
+            else
+            {
+               outputText = Double.toString(Double.parseDouble(valueOne) / Double.parseDouble(valueTwo));
+            }
+         }
+         valueOne = outputText;
+         System.out.println(outputText);
+         valueTwo = "";
+         operator = "";
+         outputWindow.setText(outputText);
+      }
+      
+      
+         // called if the user enters one of the numbers
+         // if there is no operator entered yet, a String of the number is appended to the valueOne string
+         // otherwise it is appended to the valueTwo string   
+      public void actionPerformedBuildValues (ActionEvent givenE)
+      {
+         if (operator == "")
+      {
+            valueOne = valueOne + givenE.getActionCommand(); // remembers value of first behind the scenes
+            outputText = outputText + givenE.getActionCommand();
+            outputWindow.setText(outputText);
+         }
+         else
+         {
+            valueTwo = valueTwo + givenE.getActionCommand();
+            outputText = outputText + givenE.getActionCommand();
+            outputWindow.setText(outputText);
+         }
+      }
    }
-}
+}  
