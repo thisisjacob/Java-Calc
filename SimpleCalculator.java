@@ -1,29 +1,36 @@
+// Name: Jacob Holfelder
+// Date: 7/18/2019
+// Class: CIT-130-Z03B
+// Purpose: A simple calculator that allows the user to enter two positive or zero numbers and perform
+// basic operations on them (add, subtract, multiply, divide)
+// Includes a clear function, and the result from a calculation is saved so further calculations can be performed
+// Assignment 9, Option 1
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-// to do:
-// improve appearance
-// what to do if a second operator is used in one operation
+
 public class SimpleCalculator extends JFrame implements ActionListener
 {
    private static final int WIDTH = 300;
-   private static final int HEIGHT = 300;
+   private static final int HEIGHT = 400;
    
-   private JLabel outputWindow;
+   private JLabel outputWindow; // JLabel showing the results of calculations, created here so it can be accessed
+   // by the SimpleCalculatorActionPerformedMethods inner class
    
-   private String valueOne = "";
+   private String valueOne = ""; // "left side" of the calculation
    private String operator = "";
-   private String valueTwo = "";
-   private String outputText = "";
+   private String valueTwo = ""; // "right side" of the calculation
+   private String outputText = ""; // for saving and adding onto the outputWindow JLabel as user action is performed
    
+   // actionMethods is an instance of the inner class used to hold the functions needed for the actionListener actionPerformed
    private SimpleCalculatorActionPerformedMethods actionMethods = new SimpleCalculatorActionPerformedMethods();
 
    
    public static void main(String[] args)
    {
-      SimpleCalculator calcWindow = new SimpleCalculator();
-   
+      SimpleCalculator currentRun = new SimpleCalculator();
    }
    
    public SimpleCalculator()
@@ -38,7 +45,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       // outputWindow is the top of the calculator that shows the results of user input
       outputWindow = new JLabel(valueOne, SwingConstants.CENTER);
       outputWindow.setFont(new Font("Label.font", Font.BOLD, 18));
-      outputWindow.setPreferredSize(new Dimension(WIDTH, 70)); 
+      outputWindow.setPreferredSize(new Dimension(WIDTH, 80)); 
       
 
       
@@ -62,7 +69,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       JButton equals = new JButton("=");
       JButton sum = new JButton("+");
       
-      // attaches actionListeners to all the buttons
+      // attaches actionListeners to all the buttons, interacts with actionPerformed
       one.addActionListener(this);
       two.addActionListener(this);
       three.addActionListener(this);
@@ -99,7 +106,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       buttonPanel.add(equals);
       buttonPanel.add(sum);
       
-      // outputWindow and buttonPanel are added to the main JFrame, calcWindow
+      // outputWindow and buttonPanel are added to the main JFrame, outputWindow at the top and buttonPanel at the bottom
       calcWindow.add(outputWindow, BorderLayout.NORTH);
       calcWindow.add(buttonPanel, BorderLayout.CENTER);
       
@@ -125,12 +132,11 @@ public class SimpleCalculator extends JFrame implements ActionListener
           (e.getActionCommand() == "-") ||
           (e.getActionCommand() == "+"))
       {
-         if (valueTwo == "")
+         if ((valueTwo == "") && (operator == "") && (valueOne != "")) // cannot have already used operator, cannot use before input is given for valueOne
          {
             actionMethods.actionPerformedOperator(e);
          }
       }
-    
       else if (e.getActionCommand() == "=") // equals, performs the calculation
       {
          actionMethods.actionPerformedFindResult();
@@ -161,7 +167,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
       // if an operator (other than =) is entered, this records the operator and updates the output text to the user
       public void actionPerformedOperator (ActionEvent givenE)
       {
-         // if (operator != "") // second operator 
          operator = givenE.getActionCommand();
          outputText = outputText + "  " + givenE.getActionCommand() + "  ";
          outputWindow.setText(outputText);
@@ -195,7 +200,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
             }
          }
          valueOne = outputText;
-         System.out.println(outputText);
          valueTwo = "";
          operator = "";
          outputWindow.setText(outputText);
@@ -208,7 +212,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       public void actionPerformedBuildValues (ActionEvent givenE)
       {
          if (operator == "")
-      {
+         {
             valueOne = valueOne + givenE.getActionCommand(); // remembers value of first behind the scenes
             outputText = outputText + givenE.getActionCommand();
             outputWindow.setText(outputText);
@@ -221,4 +225,5 @@ public class SimpleCalculator extends JFrame implements ActionListener
          }
       }
    }
+   // end of actionPerformed method and related functions
 }  
