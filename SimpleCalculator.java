@@ -124,7 +124,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
                (e.getActionCommand() == "-") ||
                (e.getActionCommand() == "+"))
       {
-         if ((valueTwo == "") && (operator == "") && (valueOne != "")) 
+         if ((valueOne != "")) 
          {
             actionMethods.actionPerformedOperator(e);
          }
@@ -159,9 +159,28 @@ public class SimpleCalculator extends JFrame implements ActionListener
       // if an operator (other than =) is entered, this records the operator and updates the output text to the user
       public void actionPerformedOperator (ActionEvent givenE)
       {
-         operator = givenE.getActionCommand();
-         outputText = outputText + "  " + givenE.getActionCommand() + "  ";
-         outputWindow.setText(outputText);
+         if (valueTwo == "")
+         {
+            operator = givenE.getActionCommand();
+            outputText = outputText + "  " + givenE.getActionCommand() + "  ";
+            outputWindow.setText(outputText);
+         }
+         else if (valueTwo != "")
+         {
+            
+            if (operator == "+")
+               valueOne = Double.toString(Double.parseDouble(valueOne) + Double.parseDouble(valueTwo));
+            else if (operator == "-")
+               valueOne = Double.toString(Double.parseDouble(valueOne) - Double.parseDouble(valueTwo));
+            else if (operator == "*")
+               valueOne = Double.toString(Double.parseDouble(valueOne) * Double.parseDouble(valueTwo));
+            else if (operator == "/")
+               valueOne = Double.toString(Double.parseDouble(valueOne) / Double.parseDouble(valueTwo));
+            operator = givenE.getActionCommand();
+            outputText = outputText + " " + operator + " ";
+            outputWindow.setText(outputText);
+            valueTwo = "";
+         }
       }
       
       // if the user enters = (equals), the calculation is performed and the output is updated with its results,
@@ -216,6 +235,9 @@ public class SimpleCalculator extends JFrame implements ActionListener
             outputWindow.setText(outputText);
          }
       }
+      
+      
+
    }
    // end of actionPerformed method and related functions
 }  
