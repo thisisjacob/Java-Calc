@@ -162,30 +162,14 @@ public class SimpleCalculator extends JFrame implements ActionListener
       
       // if the user enters = (equals), the calculation is performed and the output is updated with its results,
       // valueOne is given the result if further calculation on the result is needed, and the other calculation variables are set to blank
+      // !!: CURRENTLY NON FUNCTIONING AS A RESULT OF CHANGE IN SYSTEM FOR HOLDING DATA
+      // !!: UPDATE TO WORK WITH THIS NEW SYSTEM, ALSO UPDATE TO WORK WITH MULTIPLE OPERATIONS IN ONE CALCULATION
       public void actionPerformedFindResult()
       {
-         if (operator == "+")
-         {
-            outputText = Double.toString(Double.parseDouble(valueOne) + Double.parseDouble(valueTwo));
-         }
-         else if (operator == "-")
-         {
-            outputText = Double.toString(Double.parseDouble(valueOne) - Double.parseDouble(valueTwo));
-         }
-         else if (operator == "*")
-         {
-            outputText = Double.toString(Double.parseDouble(valueOne) * Double.parseDouble(valueTwo));
-         }
-         else if (operator == "/")
-         {
-            if (Double.parseDouble(valueTwo) == 0)
-            {
-               outputText = "Division by 0";
-            }
-            else
-            {
-               outputText = Double.toString(Double.parseDouble(valueOne) / Double.parseDouble(valueTwo));
-            }
+         int i;
+         for (i = 0; i < calculationHolder.length(); i++) {
+            valueOne = outputText; // placeholder
+            // if calculationHolder       ## IF NOT AN OPERATOR, STORE IN ONE OF VALUES
          }
          valueOne = outputText;
          valueTwo = "";
@@ -198,14 +182,8 @@ public class SimpleCalculator extends JFrame implements ActionListener
       // otherwise it is appended to the valueTwo string   
       public void actionPerformedBuildValues (ActionEvent givenE)
       {
-         if (((lastVal != "+") && 
-             (lastVal != "-") &&
-             (lastVal != "*") && 
-             (lastVal != "/")) ||
-             ((givenE.getActionCommand() != "+") &&
-              (givenE.getActionCommand() != "-") &&
-              (givenE.getActionCommand() != "*") &&
-              (givenE.getActionCommand() != "/"))) {
+         if (!(isGivenValOperator(lastVal)) ||
+             !(isGivenValOperator(givenE.getActionCommand()))) {
                calculationHolder = calculationHolder + givenE.getActionCommand(); // remembers value of first behind the scenes
                outputText = outputText + givenE.getActionCommand();
                lastVal = givenE.getActionCommand();
@@ -214,4 +192,13 @@ public class SimpleCalculator extends JFrame implements ActionListener
       }
    }
    // end of actionPerformed method and related functions
+
+   // START OF MISC UTILITY FUNCTIONS
+
+   public boolean isGivenValOperator (String val) {
+      return ((val == "+") ||
+              (val == "-") ||
+              (val == "*") ||
+              (val == "/"));
+   }
 }  
