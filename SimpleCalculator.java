@@ -1,6 +1,20 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+
+
+
+
+
+// CURRENT TODO:
+// ALTER actionPerformedFindResult SO IT PARSES THE calculationHolder STRING AND CALCULATES FROM THAT
+// OTHER STRING VARIABLES MAY BE NEEDED AS INTERMEDIARIES
+// TODO: USER CHOICE OF WHETHER TO USE VALUE OF LAST CALCULATION
+
+
+
+
 
 
 public class SimpleCalculator extends JFrame implements ActionListener
@@ -11,10 +25,14 @@ public class SimpleCalculator extends JFrame implements ActionListener
    private JLabel outputWindow; // JLabel showing the results of calculations, created here so it can be accessed
    // by the SimpleCalculatorActionPerformedMethods inner class
    
-   private String valueOne = ""; // "left side" of the calculation, as well as the result of a completed calculation
-   private String operator = "";
-   private String valueTwo = ""; // "right side" of the calculation
+   private String tempHolder = "";
+   private double valueOne = 0; // "left side" of the calculation, as well as the result of a completed calculation
+   private String operator = ""; // operator used
+   private double valueTwo = 0; // "right side" of the calculation
+   private double currentValOfCalculation = 0; // current and then eventually final value of equals
    private String outputText = ""; // for saving and adjusting the outputWindow JLabel as user action is performed
+   private ArrayList<String> calculationHolder = new ArrayList<String>();
+   private String lastVal = "";
    
    // actionMethods is an instance of the inner class used to hold the methods needed for the actionPerformed method
    private SimpleCalculatorActionPerformedMethods actionMethods = new SimpleCalculatorActionPerformedMethods();
@@ -23,10 +41,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
    public static void main(String[] args)
    {
       SimpleCalculator currentRun = new SimpleCalculator();
+      System.out.println("het");
    }
    
-   public SimpleCalculator()
-   {
+   public SimpleCalculator() {
 
       // calcWindow is the outer JFrame for the calculator
       JFrame calcWindow = new JFrame();
@@ -35,7 +53,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       calcWindow.setLayout(new BorderLayout());
       
       // outputWindow is the top of the calculator that shows the results of user input
-      outputWindow = new JLabel(valueOne, SwingConstants.CENTER);
+      outputWindow = new JLabel(Double.toString(currentValOfCalculation), SwingConstants.CENTER);
       outputWindow.setFont(new Font("Label.font", Font.BOLD, 18));
       outputWindow.setPreferredSize(new Dimension(WIDTH, 80)); 
       
@@ -119,16 +137,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
       {
          actionMethods.actionPerformedClear(e);
       }  
-      else if ((e.getActionCommand() == "/") || // records use of operator, stores what operator was chosen
-               (e.getActionCommand() == "*") || // cannot have already used an operator in current calculation, cannot use before input is given for valueOne
-               (e.getActionCommand() == "-") ||
-               (e.getActionCommand() == "+"))
-      {
-         if ((valueTwo == "") && (operator == "") && (valueOne != "")) 
-         {
-            actionMethods.actionPerformedOperator(e);
-         }
-      }
       else if (e.getActionCommand() == "=") // equals, performs the calculation, sets result to valueOne, shows result, resets other variables
       {
          actionMethods.actionPerformedFindResult();
@@ -149,73 +157,99 @@ public class SimpleCalculator extends JFrame implements ActionListener
       // are set to be blank
       private void actionPerformedClear(ActionEvent givenE)
       {
-         valueOne = "";
+         valueOne = 0;
          operator = "";
-         valueTwo = "";
+         valueTwo = 0;
          outputText = "";
          outputWindow.setText("");
       }
       
-      // if an operator (other than =) is entered, this records the operator and updates the output text to the user
-      public void actionPerformedOperator (ActionEvent givenE)
-      {
-         operator = givenE.getActionCommand();
-         outputText = outputText + "  " + givenE.getActionCommand() + "  ";
-         outputWindow.setText(outputText);
-      }
-      
       // if the user enters = (equals), the calculation is performed and the output is updated with its results,
       // valueOne is given the result if further calculation on the result is needed, and the other calculation variables are set to blank
+      // !!: CURRENTLY NON FUNCTIONING AS A RESULT OF CHANGE IN SYSTEM FOR HOLDING DATA
+      // !!: UPDATE TO WORK WITH THIS NEW SYSTEM, ALSO UPDATE TO WORK WITH MULTIPLE OPERATIONS IN ONE CALCULATION
+      // !!: TRIM EXTRANEOUS OPERATORS AT END
       public void actionPerformedFindResult()
       {
-         if (operator == "+")
-         {
-            outputText = Double.toString(Double.parseDouble(valueOne) + Double.parseDouble(valueTwo));
+         if (isGivenValOperator(calculationHolder.get(calculationHolder.size() - 1))) { // if there is extraneous operator at end of calculationHolder, remove
+            calculationHolder.remove(calculationHolder.size() - 1);
          }
-         else if (operator == "-")
-         {
-            outputText = Double.toString(Double.parseDouble(valueOne) - Double.parseDouble(valueTwo));
+         
+         if (calculationHolder.size() == 0) {
+
          }
-         else if (operator == "*")
-         {
-            outputText = Double.toString(Double.parseDouble(valueOne) * Double.parseDouble(valueTwo));
+         else if (calculationHolder.size() == 1) {
+            currentValOfCalculation = Double.parseDouble(calculationHolder.get(0));
          }
-         else if (operator == "/")
-         {
-            if (Double.parseDouble(valueTwo) == 0)
-            {
-               outputText = "Division by 0";
+         else {
+            int i = 0;
+            for (i = 0; i < calculationHolder.size(); i = i + 2) {
+               valueOne = Double.parseDouble(calculationHolder.get(i));
+               operator = calculationHolder.get(i + 1);
+               valueTwo = Double.parseDouble(calculationHolder.get(i + 2));
+
+               if (operator == "+") {
+                  currentValOfCalculation = currentValOfCalculation + (valueOne + valueTwo);
+               }
+               else if (operator == "-") {
+                  currentValOfCalculation = currentValOfCalculation + (valueOne - valueTwo);
+               }
+               else if (operator == "*") {
+                  currentValOfCalculation = currentValOfCalculation + (valueOne * valueTwo);
+               }
+               else if (operator == "/") {
+                  currentValOfCalculation = currentValOfCalculation + (valueOne / valueTwo);
+               }
+               System.out.println(currentValOfCalculation);
+
+                  
             }
-            else
-            {
-               outputText = Double.toString(Double.parseDouble(valueOne) / Double.parseDouble(valueTwo));
-            }
+               
          }
-         valueOne = outputText;
-         valueTwo = "";
+         valueOne = 0;
          operator = "";
-         outputWindow.setText(outputText);
+         valueTwo = 0;
+         outputWindow.setText(Double.toString(currentValOfCalculation));
+
+         calculationHolder.clear();
+         System.out.println(calculationHolder);
       }
       
-      
-      // called if the user enters one of the numbers
-      // if there is no operator entered yet, a String of the number is appended to the valueOne string
-      // otherwise it is appended to the valueTwo string   
+      // called if the user enters one of the numbers or operators
+      // adds to the ArrayList calculationHolder either a full number (ie 5555) or an operator used,
+      // disallowing repetition of operators
+      // !!: PREVENT USE OF OPERATORS AT START OF CALCULATION
       public void actionPerformedBuildValues (ActionEvent givenE)
       {
-         if (operator == "")
-         {
-            valueOne = valueOne + givenE.getActionCommand(); // remembers value of first behind the scenes
+         if (!(isGivenValOperator(givenE.getActionCommand()))) { // enters if user does not enter operator
+            tempHolder = tempHolder + givenE.getActionCommand(); // builds up the tempHolder String with given numbers that will eventually be added to the array
+            lastVal = givenE.getActionCommand();
             outputText = outputText + givenE.getActionCommand();
             outputWindow.setText(outputText);
          }
-         else
-         {
-            valueTwo = valueTwo + givenE.getActionCommand();
+         else if (!(isGivenValOperator(lastVal)) &&                  // enters when operator is used and previous value is not an operator
+                  (isGivenValOperator(givenE.getActionCommand()))) { // adds full tempHolder number String to array, then adds operator, resets tempHolder 
+            calculationHolder.add(tempHolder);                       // in preparation for next number to be added
+            calculationHolder.add(givenE.getActionCommand());
+            lastVal = givenE.getActionCommand();
+            tempHolder = "";
             outputText = outputText + givenE.getActionCommand();
             outputWindow.setText(outputText);
+            System.out.println(tempHolder);
          }
+         
+         System.out.println(calculationHolder);
+         
       }
    }
    // end of actionPerformed method and related functions
+
+   // START OF MISC UTILITY FUNCTIONS
+
+   public boolean isGivenValOperator (String val) {
+      return ((val == "+") ||
+              (val == "-") ||
+              (val == "*") ||
+              (val == "/"));
+   }
 }  
