@@ -11,8 +11,6 @@ Current Functionality:
 
 Requirements:
   A local installation of Java
+
 How To Run:
-  Compile, run through chosen IDE
-  
-SPECIAL NOTE:
-  This is the development branch, features may not be working or be entirely missing here. Use the master branch if you just want to run the program.
+  Compile, run through JVM

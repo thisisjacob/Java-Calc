@@ -8,8 +8,8 @@ import java.util.Stack;
 
 
 
-// CURRENT TODO:
 // TODO: CALCULATIONS AFTER FIRST CALCULATION
+
 
 
 
@@ -25,6 +25,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
    // by the SimpleCalculatorActionPerformedMethods inner class
    
    private String tempHolder = "";
+
    private Double valueOne = null; // "left side" of the calculation, as well as the result of a completed calculation
    private String operator = ""; // operator used
    private Double valueTwo = null; // "right side" of the calculation
@@ -42,11 +43,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
    {
       String[] testString = {"hey", "there", null, null};
       SimpleCalculator currentRun = new SimpleCalculator();
+      System.out.println("het");
    }
    
    public SimpleCalculator() {
-
-
       // calcWindow is the outer JFrame for the calculator
       JFrame calcWindow = new JFrame();
       calcWindow.setSize(WIDTH, HEIGHT);
@@ -209,7 +209,9 @@ public class SimpleCalculator extends JFrame implements ActionListener
                   applyOperator();
                }
                operatorStack.push(currentOperator);
+
             }
+               
          }
 
          while (operatorStack.size() != 0) {
@@ -268,6 +270,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
               (val == "*") ||
               (val == "/"));
    }
+
 
    // Checks is a given String can be converted into a number, returns true if so, false otherwise
    public boolean isStringNumber(String stringToCheck) {
@@ -339,5 +342,3 @@ public class SimpleCalculator extends JFrame implements ActionListener
       return false;
    }
 }
-
-  
