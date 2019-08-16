@@ -2,15 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Stack;
 
 
 
 
 
-// CURRENT TODO:
-// ALTER actionPerformedFindResult SO IT PARSES THE calculationHolder STRING AND CALCULATES FROM THAT
-// OTHER STRING VARIABLES MAY BE NEEDED AS INTERMEDIARIES
-// TODO: USER CHOICE OF WHETHER TO USE VALUE OF LAST CALCULATION
+// TODO: CALCULATIONS AFTER FIRST CALCULATION
+
 
 
 
@@ -26,12 +25,14 @@ public class SimpleCalculator extends JFrame implements ActionListener
    // by the SimpleCalculatorActionPerformedMethods inner class
    
    private String tempHolder = "";
-   private double valueOne = 0; // "left side" of the calculation, as well as the result of a completed calculation
+
+   private Double valueOne = null; // "left side" of the calculation, as well as the result of a completed calculation
    private String operator = ""; // operator used
-   private double valueTwo = 0; // "right side" of the calculation
-   private double currentValOfCalculation = 0; // current and then eventually final value of equals
+   private Double valueTwo = null; // "right side" of the calculation
    private String outputText = ""; // for saving and adjusting the outputWindow JLabel as user action is performed
    private ArrayList<String> calculationHolder = new ArrayList<String>();
+   private Stack<String> valueStack = new Stack<String>();
+   private Stack<String> operatorStack = new Stack<String>();
    private String lastVal = "";
    
    // actionMethods is an instance of the inner class used to hold the methods needed for the actionPerformed method
@@ -40,12 +41,12 @@ public class SimpleCalculator extends JFrame implements ActionListener
    
    public static void main(String[] args)
    {
+      String[] testString = {"hey", "there", null, null};
       SimpleCalculator currentRun = new SimpleCalculator();
       System.out.println("het");
    }
    
    public SimpleCalculator() {
-
       // calcWindow is the outer JFrame for the calculator
       JFrame calcWindow = new JFrame();
       calcWindow.setSize(WIDTH, HEIGHT);
@@ -53,7 +54,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       calcWindow.setLayout(new BorderLayout());
       
       // outputWindow is the top of the calculator that shows the results of user input
-      outputWindow = new JLabel(Double.toString(currentValOfCalculation), SwingConstants.CENTER);
+      outputWindow = new JLabel(Double.toString(0.0), SwingConstants.CENTER);
       outputWindow.setFont(new Font("Label.font", Font.BOLD, 18));
       outputWindow.setPreferredSize(new Dimension(WIDTH, 80)); 
       
@@ -157,63 +158,80 @@ public class SimpleCalculator extends JFrame implements ActionListener
       // are set to be blank
       private void actionPerformedClear(ActionEvent givenE)
       {
-         valueOne = 0;
+         valueOne = null;
          operator = "";
-         valueTwo = 0;
+         valueTwo = null;
          outputText = "";
          outputWindow.setText("");
       }
       
-      // if the user enters = (equals), the calculation is performed and the output is updated with its results,
-      // valueOne is given the result if further calculation on the result is needed, and the other calculation variables are set to blank
-      // !!: CURRENTLY NON FUNCTIONING AS A RESULT OF CHANGE IN SYSTEM FOR HOLDING DATA
-      // !!: UPDATE TO WORK WITH THIS NEW SYSTEM, ALSO UPDATE TO WORK WITH MULTIPLE OPERATIONS IN ONE CALCULATION
-      // !!: TRIM EXTRANEOUS OPERATORS AT END
+      // uses the shunting yard algorithm to calculation the results of a given series of values and operations given the ArrayList calculationHolder
+      // result is then output to the calculation screen
+      // MULTIPLE OPERATION CALCULATIONS NOW FUNCTIONING. SEPARATE CALCULATIONS NOW WORK IN PROGRESS
       public void actionPerformedFindResult()
       {
+         String currentOperator = "";
+
+
+         if (tempHolder != "") { // if there is a value in the tempHolder buffer, add to calculationHolder ArrayList
+            calculationHolder.add(tempHolder); 
+            tempHolder = "";
+         }
          if (isGivenValOperator(calculationHolder.get(calculationHolder.size() - 1))) { // if there is extraneous operator at end of calculationHolder, remove
             calculationHolder.remove(calculationHolder.size() - 1);
          }
-         
-         if (calculationHolder.size() == 0) {
 
-         }
-         else if (calculationHolder.size() == 1) {
-            currentValOfCalculation = Double.parseDouble(calculationHolder.get(0));
-         }
-         else {
-            int i = 0;
-            for (i = 0; i < calculationHolder.size(); i = i + 2) {
-               valueOne = Double.parseDouble(calculationHolder.get(i));
-               operator = calculationHolder.get(i + 1);
-               valueTwo = Double.parseDouble(calculationHolder.get(i + 2));
+         int i;
+         for (i = 0; i < calculationHolder.size(); i++) { // parse calculationHolder using shunting yard algorithm
 
-               if (operator == "+") {
-                  currentValOfCalculation = currentValOfCalculation + (valueOne + valueTwo);
+            if (isStringNumber(calculationHolder.get(i))) { // if number, push onto valueStack
+               valueStack.push(calculationHolder.get(i));
+            }
+            else if (calculationHolder.get(i) == "(") { // if left parenthesis, push to top of operatorStack
+               operatorStack.push("(");
+            }
+            else if (calculationHolder.get(i) == ")") { // if right parenthesis, evaluate items inside the two parenthesis
+               while (operatorStack.get(operatorStack.size() - 1) != "(") {
+                  operator = operatorStack.pop();
+                  valueTwo = Double.parseDouble(valueStack.pop());
+                  valueOne = Double.parseDouble(valueStack.pop());
+                  applyOperator();
                }
-               else if (operator == "-") {
-                  currentValOfCalculation = currentValOfCalculation + (valueOne - valueTwo);
+               operatorStack.pop();
+            }
+            else if (isGivenValOperator(calculationHolder.get(i))) { // if token is operator, evaluate procedure
+               currentOperator = calculationHolder.get(i);
+               while ((operatorStack.size() != 0) &&
+                      (checkPrecedence(operatorStack.peek(), currentOperator))) { // !!: should operate based on priority, UNFINISHEDD 1.2.5
+                  operator = operatorStack.pop();// pop top operator, assign to operator variable
+                  valueTwo = Double.parseDouble(valueStack.pop()); // pop top two values, assign the first operand to valueOne and second to valueTwo
+                  valueOne = Double.parseDouble(valueStack.pop());
+                  applyOperator();
                }
-               else if (operator == "*") {
-                  currentValOfCalculation = currentValOfCalculation + (valueOne * valueTwo);
-               }
-               else if (operator == "/") {
-                  currentValOfCalculation = currentValOfCalculation + (valueOne / valueTwo);
-               }
-               System.out.println(currentValOfCalculation);
+               operatorStack.push(currentOperator);
 
-                  
             }
                
          }
-         valueOne = 0;
-         operator = "";
-         valueTwo = 0;
-         outputWindow.setText(Double.toString(currentValOfCalculation));
 
-         calculationHolder.clear();
+         while (operatorStack.size() != 0) {
+            operator = operatorStack.pop();
+            valueTwo = Double.parseDouble(valueStack.pop());
+            valueOne = Double.parseDouble(valueStack.pop());
+            applyOperator();
+         }
+
          System.out.println(calculationHolder);
+         System.out.println(valueStack);
+         System.out.println(operatorStack);
+         outputWindow.setText(valueStack.peek());
+         calculationHolder.clear();
+               
       }
+      
+
+
+
       
       // called if the user enters one of the numbers or operators
       // adds to the ArrayList calculationHolder either a full number (ie 5555) or an operator used,
@@ -252,4 +270,75 @@ public class SimpleCalculator extends JFrame implements ActionListener
               (val == "*") ||
               (val == "/"));
    }
-}  
+
+
+   // Checks is a given String can be converted into a number, returns true if so, false otherwise
+   public boolean isStringNumber(String stringToCheck) {
+      try {
+         Double.parseDouble(stringToCheck);
+         return true;
+      }
+      catch (NumberFormatException e) {
+         return false;
+      }
+   }
+
+   public void applyOperator() {
+      if (operator == "+") { // perform calculation, add calculated value to top of valueStack
+         valueStack.push(Double.toString(valueOne + valueTwo));
+      }
+      else if (operator == "-") {
+         valueStack.push(Double.toString(valueOne - valueTwo));
+      }
+      else if (operator == "*") {
+         valueStack.push(Double.toString(valueOne * valueTwo));
+      }
+      else if (operator == "/") {
+         valueStack.push(Double.toString(valueOne / valueTwo));
+      }
+   }
+
+   // compares the firstOperator and secondOperator precedence using standard mathematical order of operators
+   // returns true if firstOperator has higher or the same precedence as secondOperator
+   public boolean checkPrecedence(String firstOperator, String secondOperator) {
+      int firstOpPrecedence = 0;
+      int secondOpPrecedence = 0;
+
+      if (firstOperator == "^") {
+         firstOpPrecedence = 4;
+      }
+      else if (firstOperator == "*") {
+         firstOpPrecedence = 3;
+      }
+      else if (firstOperator == "/") {
+         firstOpPrecedence = 3;
+      }
+      else if (firstOperator == "+") {
+         firstOpPrecedence = 2;
+      }
+      else if (firstOperator == "-") {
+         firstOpPrecedence = 2;
+      }
+
+      if (secondOperator == "^") {
+         secondOpPrecedence = 4;
+      }
+      else if (secondOperator == "*") {
+         secondOpPrecedence = 3;
+      }
+      else if (secondOperator == "/") {
+         secondOpPrecedence = 3;
+      }
+      else if (secondOperator == "+") {
+         secondOpPrecedence = 2;
+      }
+      else if (secondOperator == "-") {
+         secondOpPrecedence = 2;
+      }
+
+      if (firstOpPrecedence >= secondOpPrecedence) {
+         return true;
+      }
+      return false;
+   }
+}
