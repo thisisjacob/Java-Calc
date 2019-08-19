@@ -8,14 +8,6 @@ import java.util.Stack;
 
 
 
-// CURRENT TODO:
-// TODO: CALCULATIONS AFTER FIRST CALCULATION
-
-
-
-
-
-
 public class SimpleCalculator extends JFrame implements ActionListener
 {
    private static final int WIDTH = 300;
@@ -72,7 +64,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       JButton six = new JButton("6");
       JButton multiply = new JButton("*");
       JButton seven = new JButton("7");
-      JButton eight = new JButton("9");
+      JButton eight = new JButton("8");
       JButton nine = new JButton("9");
       JButton subtract = new JButton("-");
       JButton clear = new JButton("C");
@@ -138,7 +130,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       {
          actionMethods.actionPerformedClear(e);
       }  
-      else if (e.getActionCommand() == "=") // equals, performs the calculation, sets result to valueOne, shows result, resets other variables
+      else if (e.getActionCommand() == "=") // equals, performs the calculation, shows results, saves result
       {
          actionMethods.actionPerformedFindResult();
       }
@@ -162,12 +154,16 @@ public class SimpleCalculator extends JFrame implements ActionListener
          operator = "";
          valueTwo = null;
          outputText = "";
-         outputWindow.setText("");
+         lastVal = "";
+         tempHolder = "";
+         valueStack.clear();
+         operatorStack.clear();
+         calculationHolder.clear();
+         outputWindow.setText("0.0");
       }
       
       // uses the shunting yard algorithm to calculation the results of a given series of values and operations given the ArrayList calculationHolder
-      // result is then output to the calculation screen
-      // MULTIPLE OPERATION CALCULATIONS NOW FUNCTIONING. SEPARATE CALCULATIONS NOW WORK IN PROGRESS
+      // result is then output to the calculation screen, saved as only value in valueStack
       public void actionPerformedFindResult()
       {
          String currentOperator = "";
@@ -182,7 +178,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
          }
 
          int i;
-         for (i = 0; i < calculationHolder.size(); i++) { // parse calculationHolder using shunting yard algorithm
+         for (i = 0; i < calculationHolder.size(); i++) { // begin to parse calculationHolder using shunting yard algorithm
 
             if (isStringNumber(calculationHolder.get(i))) { // if number, push onto valueStack
                valueStack.push(calculationHolder.get(i));
@@ -202,9 +198,9 @@ public class SimpleCalculator extends JFrame implements ActionListener
             else if (isGivenValOperator(calculationHolder.get(i))) { // if token is operator, evaluate procedure
                currentOperator = calculationHolder.get(i);
                while ((operatorStack.size() != 0) &&
-                      (checkPrecedence(operatorStack.peek(), currentOperator))) { // !!: should operate based on priority, UNFINISHEDD 1.2.5
-                  operator = operatorStack.pop();// pop top operator, assign to operator variable
-                  valueTwo = Double.parseDouble(valueStack.pop()); // pop top two values, assign the first operand to valueOne and second to valueTwo
+                      (checkPrecedence(operatorStack.peek(), currentOperator))) { // operates on high precedence operators
+                  operator = operatorStack.pop();
+                  valueTwo = Double.parseDouble(valueStack.pop()); 
                   valueOne = Double.parseDouble(valueStack.pop());
                   applyOperator();
                }
@@ -212,19 +208,18 @@ public class SimpleCalculator extends JFrame implements ActionListener
             }
          }
 
-         while (operatorStack.size() != 0) {
+         while (operatorStack.size() != 0) { // while operatorStack still has items, operate on numbers (after higher precedence ops performed)
             operator = operatorStack.pop();
             valueTwo = Double.parseDouble(valueStack.pop());
             valueOne = Double.parseDouble(valueStack.pop());
             applyOperator();
          }
-
-         System.out.println(calculationHolder);
-         System.out.println(valueStack);
-         System.out.println(operatorStack);
+         
+         // change output to user to calculation, make only value in calculationHolder the result
+         outputText = valueStack.peek();
          outputWindow.setText(valueStack.peek());
          calculationHolder.clear();
-               
+         calculationHolder.add(valueStack.peek());
       }
       
 
@@ -234,20 +229,30 @@ public class SimpleCalculator extends JFrame implements ActionListener
       // called if the user enters one of the numbers or operators
       // adds to the ArrayList calculationHolder either a full number (ie 5555) or an operator used,
       // disallowing repetition of operators
-      // !!: PREVENT USE OF OPERATORS AT START OF CALCULATION
       public void actionPerformedBuildValues (ActionEvent givenE)
       {
-         if (!(isGivenValOperator(givenE.getActionCommand()))) { // enters if user does not enter operator
+         if ((valueStack.size() != 0) &&                                // if result of last calculation still in memory, but next value is not operator
+             (calculationHolder.size() == 1) &&                         // reset memory and start new calculation with new number
+             (isGivenValOperator(givenE.getActionCommand()) != true)) {
+            valueStack.clear();
+            calculationHolder.clear();
+            tempHolder = givenE.getActionCommand();
+            lastVal = givenE.getActionCommand();
+            outputText = givenE.getActionCommand();
+            outputWindow.setText(outputText);
+         }
+         else if (!(isGivenValOperator(givenE.getActionCommand()))) { // enters if user does not enter operator
             tempHolder = tempHolder + givenE.getActionCommand(); // builds up the tempHolder String with given numbers that will eventually be added to the array
             lastVal = givenE.getActionCommand();
             outputText = outputText + givenE.getActionCommand();
             outputWindow.setText(outputText);
          }
-         else if (!(isGivenValOperator(lastVal)) &&                  // enters when operator is used and previous value is not an operator
-                  (isGivenValOperator(givenE.getActionCommand()))) { // adds full tempHolder number String to array, then adds operator, resets tempHolder 
-            calculationHolder.add(tempHolder);                       // in preparation for next number to be added
-            calculationHolder.add(givenE.getActionCommand());
-            lastVal = givenE.getActionCommand();
+         else if (!(isGivenValOperator(lastVal)) &&                  // if operator used, operator not last value used o r first value in calculation,
+                  (isGivenValOperator(givenE.getActionCommand())) && // then do this
+                  ((tempHolder.length() != 0) || (calculationHolder.size() != 0))) {                                              
+            calculationHolder.add(tempHolder);                       
+            calculationHolder.add(givenE.getActionCommand());        // adds full tempHolder number String to calculationHolder arrayList, then adds operator, resets tempHolder 
+            lastVal = givenE.getActionCommand();                     // in preparation for next number to be added, updates output to user
             tempHolder = "";
             outputText = outputText + givenE.getActionCommand();
             outputWindow.setText(outputText);
