@@ -21,10 +21,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
    private String operator = ""; // operator used
    private Double valueTwo = null; // "right side" of the calculation
    private String outputText = ""; // for saving and adjusting the outputWindow JLabel as user action is performed
-   private ArrayList<String> calculationHolder = new ArrayList<String>();
+   private ArrayList<String> calculationHolder = new ArrayList<String>(); // holds all the numbers and operators in a single calculation
    private Stack<String> valueStack = new Stack<String>();
    private Stack<String> operatorStack = new Stack<String>();
-   private String lastVal = "";
+   private String lastVal = ""; // last value entered before calculation performed
    
    // actionMethods is an instance of the inner class used to hold the methods needed for the actionPerformed method
    private SimpleCalculatorActionPerformedMethods actionMethods = new SimpleCalculatorActionPerformedMethods();
@@ -32,7 +32,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
    
    public static void main(String[] args)
    {
-      String[] testString = {"hey", "there", null, null};
       SimpleCalculator currentRun = new SimpleCalculator();
    }
    
@@ -54,7 +53,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       
       // the bottom section of the calculator, holds all the buttons in a grid for the user to interact with
       JPanel buttonPanel = new JPanel();
-      buttonPanel.setLayout(new GridLayout(4, 4));
+      buttonPanel.setLayout(new GridLayout(5, 5));
       JButton one = new JButton("1");
       JButton two = new JButton("2");
       JButton three = new JButton("3");
@@ -71,6 +70,8 @@ public class SimpleCalculator extends JFrame implements ActionListener
       JButton zero = new JButton("0");
       JButton equals = new JButton("=");
       JButton sum = new JButton("+");
+      JButton decimal = new JButton(".");
+      JButton switchSign = new JButton("+/-");
       
       // attaches actionListeners to all the buttons, interacts with actionPerformed
       one.addActionListener(this);
@@ -89,6 +90,8 @@ public class SimpleCalculator extends JFrame implements ActionListener
       zero.addActionListener(this);
       equals.addActionListener(this);
       sum.addActionListener(this);
+      decimal.addActionListener(this);
+      switchSign.addActionListener(this);
       
       
       // adds the buttons to buttonPanel
@@ -108,6 +111,8 @@ public class SimpleCalculator extends JFrame implements ActionListener
       buttonPanel.add(zero);
       buttonPanel.add(equals);
       buttonPanel.add(sum);
+      buttonPanel.add(decimal);
+      buttonPanel.add(switchSign);
       
       // outputWindow and buttonPanel are added to the main JFrame, outputWindow at the top and buttonPanel at the bottom
       calcWindow.add(outputWindow, BorderLayout.NORTH);
@@ -128,13 +133,19 @@ public class SimpleCalculator extends JFrame implements ActionListener
    {
       if (e.getActionCommand() == "C") // clear command used, outputWindow text and all calculation variables reset
       {
-         actionMethods.actionPerformedClear(e);
+         actionMethods.actionPerformedClear();
       }  
       else if (e.getActionCommand() == "=") // equals, performs the calculation, shows results, saves result
       {
          actionMethods.actionPerformedFindResult();
       }
-      else  // operator not yet used or clear has been activated, builds up the valueOne or valueTwo String
+      else if (e.getActionCommand() == ".") { // adds decimal to number if not already inserted in number
+         actionMethods.actionPerformedDecimal();
+      }
+      else if (e.getActionCommand() == "+/-" && (tempHolder != "")) {
+         actionMethods.actionPerformedChangeSign(e);
+      }
+      else if (isGivenValOperator(e.getActionCommand()) || isStringNumber(e.getActionCommand())) // operator not yet used or clear has been activated, builds up the valueOne or valueTwo String
       {
          actionMethods.actionPerformedBuildValues(e);
       }
@@ -148,7 +159,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       // if action event recieves a command for clearing the calculator
       // then all the variables for holding information and the text output
       // are set to be blank
-      private void actionPerformedClear(ActionEvent givenE)
+      private void actionPerformedClear()
       {
          valueOne = null;
          operator = "";
@@ -215,16 +226,44 @@ public class SimpleCalculator extends JFrame implements ActionListener
             applyOperator();
          }
          
-         // change output to user to calculation, make only value in calculationHolder the result
+         // change output to user to calculation, make only value in calculationHolder, save to tempHolder, clear calculationHolder
+         tempHolder = valueStack.peek();
          outputText = valueStack.peek();
          outputWindow.setText(valueStack.peek());
          calculationHolder.clear();
          calculationHolder.add(valueStack.peek());
       }
       
+      public void actionPerformedDecimal() { // adds decimal to current number if it does not already have a decimal inserted
+         boolean decimalInNumber = false; 
+         int i;
+         for (i = 0; i < tempHolder.length(); i++) { // check if decimal in current number
+            if (tempHolder.charAt(i) == '.') {
+               decimalInNumber = true; // if true, decimal already in number, do not insert another
+            }
+         }
+         if (decimalInNumber == false) { // if false, insert decimal, make adjustments to output
+            tempHolder = tempHolder + ".";
+            outputText = outputText + ".";
+            outputWindow.setText(outputText);
+         }
+      }
 
-
-
+      // when called, switches the sign of tempHolder (the current number being altered) by string manipulation
+      public void actionPerformedChangeSign(ActionEvent givenE) { 
+         if (tempHolder.charAt(0) == '-') { // if already negative, switch to positive
+            outputText = outputText.substring(0, (outputText.length() - tempHolder.length()));
+            tempHolder = tempHolder.substring(1); 
+            outputText = outputText + tempHolder;
+            outputWindow.setText(outputText);
+         }
+         else { // if positive, switch to negative
+            outputText = outputText.substring(0, (outputText.length() - tempHolder.length()));
+            tempHolder = "-" + tempHolder;
+            outputText = outputText + tempHolder;
+            outputWindow.setText(outputText);
+         }
+      }
       
       // called if the user enters one of the numbers or operators
       // adds to the ArrayList calculationHolder either a full number (ie 5555) or an operator used,
