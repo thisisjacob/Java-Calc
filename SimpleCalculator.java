@@ -121,18 +121,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
       buttonPanel.add(equals);
       buttonPanel.add(sum);
       
-
-      
-
-      
-
-      
-      
-      
-      
-      
-      
-      
       // outputWindow and buttonPanel are added to the main JFrame, outputWindow at the top and buttonPanel at the bottom
       calcWindow.add(outputWindow, BorderLayout.NORTH);
       calcWindow.add(buttonPanel, BorderLayout.CENTER);
@@ -163,6 +151,9 @@ public class SimpleCalculator extends JFrame implements ActionListener
       }
       else if (e.getActionCommand() == "+/-" && (tempHolder != "")) {
          actionMethods.actionPerformedChangeSign(e);
+      }
+      else if ((e.getActionCommand() == "x^2") || (e.getActionCommand() == "sqrt(x)")) {
+         actionMethods.actionPerformedFunctionApplied(e);
       }
       else if (isGivenValOperator(e.getActionCommand()) || isStringNumber(e.getActionCommand())) // operator not yet used or clear has been activated, builds up the valueOne or valueTwo String
       {
@@ -268,6 +259,21 @@ public class SimpleCalculator extends JFrame implements ActionListener
          }
       }
 
+      public void actionPerformedFunctionApplied(ActionEvent givenE) {
+         if (givenE.getActionCommand() == "x^2") {
+            outputText = outputText.substring(0, (outputText.length() - tempHolder.length()));
+            tempHolder = Double.toString(Math.pow(Double.parseDouble(tempHolder), 2));
+            outputText = outputText + tempHolder;
+            outputWindow.setText(outputText);
+         }
+         else if (givenE.getActionCommand() == "sqrt(x)") {
+            outputText = outputText.substring(0, (outputText.length() - tempHolder.length()));
+            tempHolder = Double.toString(Math.pow(Double.parseDouble(tempHolder), 0.5));
+            outputText = outputText + tempHolder;
+            outputWindow.setText(outputText);
+         }
+      }
+
       // when called, switches the sign of tempHolder (the current number being altered) by string manipulation
       public void actionPerformedChangeSign(ActionEvent givenE) { 
          if (tempHolder.charAt(0) == '-') { // if already negative, switch to positive
@@ -329,7 +335,9 @@ public class SimpleCalculator extends JFrame implements ActionListener
       return ((val == "+") ||
               (val == "-") ||
               (val == "*") ||
-              (val == "/"));
+              (val == "/") ||
+              (val == "x^2") ||
+              (val == "sqrt(x)"));
    }
 
    // Checks is a given String can be converted into a number, returns true if so, false otherwise
