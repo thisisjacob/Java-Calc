@@ -152,7 +152,8 @@ public class SimpleCalculator extends JFrame implements ActionListener
       else if (e.getActionCommand() == "+/-" && (tempHolder != "")) {
          actionMethods.actionPerformedChangeSign(e);
       }
-      else if ((e.getActionCommand() == "x^2") || (e.getActionCommand() == "sqrt(x)")) {
+      else if (((e.getActionCommand() == "x^2") || (e.getActionCommand() == "sqrt(x)")) && // applies one of the given mathematicals if tempHolder not empty
+                (tempHolder.length() != 0)) {
          actionMethods.actionPerformedFunctionApplied(e);
       }
       else if (isGivenValOperator(e.getActionCommand()) || isStringNumber(e.getActionCommand())) // operator not yet used or clear has been activated, builds up the valueOne or valueTwo String
@@ -259,9 +260,9 @@ public class SimpleCalculator extends JFrame implements ActionListener
          }
       }
 
-      public void actionPerformedFunctionApplied(ActionEvent givenE) {
-         if (givenE.getActionCommand() == "x^2") {
-            outputText = outputText.substring(0, (outputText.length() - tempHolder.length()));
+      public void actionPerformedFunctionApplied(ActionEvent givenE) { // applies a mathematical function to tempHolder, updates
+         if (givenE.getActionCommand() == "x^2") {                     // output to user to show result of that function, value
+            outputText = outputText.substring(0, (outputText.length() - tempHolder.length())); // usable in further calculations
             tempHolder = Double.toString(Math.pow(Double.parseDouble(tempHolder), 2));
             outputText = outputText + tempHolder;
             outputWindow.setText(outputText);
