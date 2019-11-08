@@ -321,10 +321,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
             tempHolder = "";
             outputText = outputText + givenE.getActionCommand();
             outputWindow.setText(outputText);
-            System.out.println(tempHolder);
+            // System.out.println(tempHolder); // debug, tracking state
          }
          
-         System.out.println(calculationHolder);
+         //System.out.println(calculationHolder); // debug, tracking state
          
       }
    }
