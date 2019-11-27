@@ -307,36 +307,38 @@ public class SimpleCalculator extends JFrame implements ActionListener
       }
 
       public void actionPerformedUndo(ActionEvent givenE) {
-         
-         if (isGivenValOperator(lastVal) || ((lastVal == "undidNumber")                // lastVal was operator, or next value to undo must be an operator, then undo an operator
-            && (calculationHolder.get(calculationHolder.size() - 1).length() != 0))) { 
+         System.out.println(isStringNumber(lastVal));
+         if (calculationHolder.size() != 0 && calculationHolder.get(calculationHolder.size() - 1).length() == 0) { // if next item in calculationHolder ArrayList is empty, remove that item before doing anything else
+            System.out.println(1);
+            calculationHolder.remove(calculationHolder.size() - 1);
+            actionPerformedUndo(givenE);
+         }
+
+         if (tempHolder == "" && (calculationHolder.get(calculationHolder.size() - 1).length() != 0) // if next value to remove must be an operator, remove the operator
+            && lastVal != "undidOperator") { 
             if (calculationHolder.size() != 0) { // if calculationHolder not empty, remove next operator
                lastVal = "undidOperator"; // set to generic number since operator was removed
                calculationHolder.remove(calculationHolder.size() - 1);
                outputText = outputText.substring(0, outputText.length() - 1);
                outputWindow.setText(outputText);
+               tempHolder = calculationHolder.get(calculationHolder.size() - 1);
             }
          }
          else if (isStringNumber(lastVal) || (lastVal == "undidOperator")) { // if the next thing to be undone must be a number, then undo number
             System.out.println(0);
-            if (calculationHolder.size() != 0) {
-               if (calculationHolder.get(calculationHolder.size() - 1).length() == 0) { // if last item in ArrayList calculationHolder is empty, remove empty item and recall actionPerformedUndo
-                  System.out.println(1);
-                  calculationHolder.remove(calculationHolder.size() - 1);
-                  lastVal = "undidNumber";
-                  actionPerformedUndo(givenE);
-                  outputText = outputText.substring(0, outputText.length() - 1);
-                  outputWindow.setText(outputText);
-               }
-               else { // if last item in ArrayList calculationHolder is not empty, set that value to be itself minus the last value
-                  System.out.println(2);
-                  calculationHolder.set((calculationHolder.size() - 1), (calculationHolder.get(calculationHolder.size() - 1).substring(0, calculationHolder.get(calculationHolder.size() - 1).length())));
-                  lastVal = "undidNumber";
-                  outputText = outputText.substring(0, outputText.length() - 1);
-                  outputWindow.setText(outputText);
-               }
+            if (tempHolder.length() != 0) {
+               tempHolder = tempHolder.substring(0, tempHolder.length() - 1);
+               outputText = outputText.substring(0, outputText.length() - 1);
+               outputWindow.setText(outputText);
             }
-
+            else if (calculationHolder.size() != 0 && tempHolder == "") { // if last item in ArrayList calculationHolder is not empty, set that value to be itself minus the last value
+               System.out.println(2);
+               tempHolder = calculationHolder.get(calculationHolder.size() - 1);
+               tempHolder = tempHolder.substring(0, tempHolder.length() - 1);
+               calculationHolder.remove(calculationHolder.size() - 1);
+               outputText = outputText.substring(0, outputText.length() - 1);
+               outputWindow.setText(outputText);
+            }
          }
       }
       
