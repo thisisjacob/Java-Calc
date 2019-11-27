@@ -255,6 +255,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
          // change output to user to calculation, make only value in calculationHolder, save to tempHolder, clear calculationHolder
          tempHolder = valueStack.peek();
          outputText = valueStack.peek();
+         lastVal = "";
          outputWindow.setText(valueStack.peek());
          calculationHolder.clear();
          calculationHolder.add(valueStack.peek());
