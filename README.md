@@ -1,15 +1,7 @@
 # Java-Calc
-A personal and simple calculator project made in Java
+Standard calculator made in Java standard library, using AWT and Swing
 
-Current Functionality:
 
-Calculations with an arbitrary amount of numbers and operations, following standard order of operations, with a functional 
-user interface
-	
-Saving numbers between operations
-	
-Requirements:
-  A local installation of Java
-  
-How To Run:
-  Compile, run through standard method
+
+
+![alt tag](https://i.imgur.com/OblpBgz.png)
