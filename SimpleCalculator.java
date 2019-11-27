@@ -32,7 +32,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
    
    public static void main(String[] args)
    {
-      SimpleCalculator currentRun = new SimpleCalculator();
+      new SimpleCalculator();
    }
    
    public SimpleCalculator() {
@@ -53,7 +53,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       
       // the bottom section of the calculator, holds all the buttons in a grid for the user to interact with
       JPanel buttonPanel = new JPanel();
-      buttonPanel.setLayout(new GridLayout(5, 5));
+      buttonPanel.setLayout(new GridLayout(6, 5));
 
       JButton sqRoot = new JButton("sqrt(x)");
       JButton square = new JButton("x^2");
@@ -75,6 +75,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
       JButton sum = new JButton("+");
       JButton decimal = new JButton(".");
       JButton switchSign = new JButton("+/-");
+      JButton undo = new JButton("Back");
+      JButton n1 = new JButton("n1");
+      JButton n2 = new JButton("n2");
+      JButton n3 = new JButton("n3");
       
       // attaches actionListeners to all the buttons, interacts with actionPerformed
       sqRoot.addActionListener(this);
@@ -97,6 +101,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
       sum.addActionListener(this);
       decimal.addActionListener(this);
       switchSign.addActionListener(this);
+      undo.addActionListener(this);
+      n1.addActionListener(this);
+      n2.addActionListener(this);
+      n3.addActionListener(this);
       
       
       // adds the buttons to buttonPanel
@@ -104,6 +112,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
       buttonPanel.add(square);
       buttonPanel.add(switchSign);
       buttonPanel.add(clear);
+      buttonPanel.add(undo);
+      buttonPanel.add(n1);
+      buttonPanel.add(n2);
+      buttonPanel.add(n3);
       buttonPanel.add(seven);
       buttonPanel.add(eight);
       buttonPanel.add(nine);
@@ -155,6 +167,9 @@ public class SimpleCalculator extends JFrame implements ActionListener
       else if (((e.getActionCommand() == "x^2") || (e.getActionCommand() == "sqrt(x)")) && // applies one of the given mathematicals if tempHolder not empty
                 (tempHolder.length() != 0)) {
          actionMethods.actionPerformedFunctionApplied(e);
+      }
+      else if (e.getActionCommand() == "Back") {
+         actionMethods.actionPerformedUndo(e);
       }
       else if (isGivenValOperator(e.getActionCommand()) || isStringNumber(e.getActionCommand())) // operator not yet used or clear has been activated, builds up the valueOne or valueTwo String
       {
@@ -290,6 +305,40 @@ public class SimpleCalculator extends JFrame implements ActionListener
             outputWindow.setText(outputText);
          }
       }
+
+      public void actionPerformedUndo(ActionEvent givenE) {
+         
+         if (isGivenValOperator(lastVal) || ((lastVal == "undidNumber")                // lastVal was operator, or next value to undo must be an operator, then undo an operator
+            && (calculationHolder.get(calculationHolder.size() - 1).length() != 0))) { 
+            if (calculationHolder.size() != 0) { // if calculationHolder not empty, remove next operator
+               lastVal = "undidOperator"; // set to generic number since operator was removed
+               calculationHolder.remove(calculationHolder.size() - 1);
+               outputText = outputText.substring(0, outputText.length() - 1);
+               outputWindow.setText(outputText);
+            }
+         }
+         else if (isStringNumber(lastVal) || (lastVal == "undidOperator")) { // if the next thing to be undone must be a number, then undo number
+            System.out.println(0);
+            if (calculationHolder.size() != 0) {
+               if (calculationHolder.get(calculationHolder.size() - 1).length() == 0) { // if last item in ArrayList calculationHolder is empty, remove empty item and recall actionPerformedUndo
+                  System.out.println(1);
+                  calculationHolder.remove(calculationHolder.size() - 1);
+                  lastVal = "undidNumber";
+                  actionPerformedUndo(givenE);
+                  outputText = outputText.substring(0, outputText.length() - 1);
+                  outputWindow.setText(outputText);
+               }
+               else { // if last item in ArrayList calculationHolder is not empty, set that value to be itself minus the last value
+                  System.out.println(2);
+                  calculationHolder.set((calculationHolder.size() - 1), (calculationHolder.get(calculationHolder.size() - 1).substring(0, calculationHolder.get(calculationHolder.size() - 1).length())));
+                  lastVal = "undidNumber";
+                  outputText = outputText.substring(0, outputText.length() - 1);
+                  outputWindow.setText(outputText);
+               }
+            }
+
+         }
+      }
       
       // called if the user enters one of the numbers or operators
       // adds to the ArrayList calculationHolder either a full number (ie 5555) or an operator used,
@@ -312,7 +361,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
             outputText = outputText + givenE.getActionCommand();
             outputWindow.setText(outputText);
          }
-         else if (!(isGivenValOperator(lastVal)) &&                  // if operator used, operator not last value used o r first value in calculation,
+         else if (!(isGivenValOperator(lastVal)) &&                  // if operator used, operator not last value used or first value in calculation,
                   (isGivenValOperator(givenE.getActionCommand())) && // then do this
                   ((tempHolder.length() != 0) || (calculationHolder.size() != 0))) {                                              
             calculationHolder.add(tempHolder);                       
@@ -321,10 +370,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
             tempHolder = "";
             outputText = outputText + givenE.getActionCommand();
             outputWindow.setText(outputText);
-            System.out.println(tempHolder);
+            // System.out.println(tempHolder); // debug, tracking state
          }
          
-         System.out.println(calculationHolder);
+         //System.out.println(calculationHolder); // debug, tracking state
          
       }
    }
