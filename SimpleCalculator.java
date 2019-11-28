@@ -308,39 +308,45 @@ public class SimpleCalculator extends JFrame implements ActionListener
       }
 
       public void actionPerformedUndo(ActionEvent givenE) {
-         System.out.println(isStringNumber(lastVal));
+         System.out.println("begin");
+         System.out.println("calculationHolder: " + calculationHolder);
+         System.out.println("calculationHolder.size():" + calculationHolder.size());
+         System.out.println("tempHolder: " + tempHolder);
          if (calculationHolder.size() != 0 && calculationHolder.get(calculationHolder.size() - 1).length() == 0) { // if next item in calculationHolder ArrayList is empty, remove that item before doing anything else
-            System.out.println(1);
             calculationHolder.remove(calculationHolder.size() - 1);
-            actionPerformedUndo(givenE);
          }
 
-         if (tempHolder.equals("") && (calculationHolder.get(calculationHolder.size() - 1).length() != 0) // if next value to remove must be an operator, remove the operator
+         if (calculationHolder.size() != 0 && tempHolder.equals("") // if next value to remove must be an operator, remove the operator
+            && (calculationHolder.get(calculationHolder.size() - 1).length() != 0) 
             && lastVal != "undidOperator") { 
-            if (calculationHolder.size() != 0) { // if calculationHolder not empty, remove next operator
-               lastVal = "undidOperator"; // set to generic number since operator was removed
-               calculationHolder.remove(calculationHolder.size() - 1);
-               outputText = outputText.substring(0, outputText.length() - 1);
-               outputWindow.setText(outputText);
-               tempHolder = calculationHolder.get(calculationHolder.size() - 1);
-            }
+            System.out.println(1);
+            lastVal = "undidOperator"; // set to generic number since operator was removed
+            calculationHolder.remove(calculationHolder.size() - 1);
+            outputText = outputText.substring(0, outputText.length() - 1);
+            outputWindow.setText(outputText);
+            tempHolder = calculationHolder.get(calculationHolder.size() - 1);
          }
-         else if (isStringNumber(lastVal) || (lastVal.equals("undidOperator"))) { // if the next thing to be undone must be a number, then undo number
-            System.out.println(0);
-            if (tempHolder.length() != 0) {
-               tempHolder = tempHolder.substring(0, tempHolder.length() - 1);
-               outputText = outputText.substring(0, outputText.length() - 1);
-               outputWindow.setText(outputText);
+         else if (tempHolder.length() != 0) {
+            System.out.println(2);
+            if (calculationHolder.size() != 0 && tempHolder.equals(calculationHolder.get(calculationHolder.size() - 1))) {
+               calculationHolder.set((calculationHolder.size() - 1), calculationHolder.get(calculationHolder.size() - 1).substring(0, calculationHolder.get(calculationHolder.size() - 1).length() - 1));
             }
-            else if (calculationHolder.size() != 0 && tempHolder.equals("")) { // if last item in ArrayList calculationHolder is not empty, set that value to be itself minus the last value
-               System.out.println(2);
-               tempHolder = calculationHolder.get(calculationHolder.size() - 1);
-               tempHolder = tempHolder.substring(0, tempHolder.length() - 1);
-               calculationHolder.remove(calculationHolder.size() - 1);
-               outputText = outputText.substring(0, outputText.length() - 1);
-               outputWindow.setText(outputText);
-            }
+            tempHolder = tempHolder.substring(0, tempHolder.length() - 1);
+            outputText = outputText.substring(0, outputText.length() - 1);
+            outputWindow.setText(outputText);
          }
+         else if (calculationHolder.size() != 0 && tempHolder.equals("")) { // if last item in ArrayList calculationHolder is not empty, set that value to be itself minus the last value
+            System.out.println(3);
+            tempHolder = calculationHolder.get(calculationHolder.size() - 1);
+            tempHolder = tempHolder.substring(0, tempHolder.length() - 1);
+            calculationHolder.remove(calculationHolder.size() - 1);
+            outputText = outputText.substring(0, outputText.length() - 1);
+            outputWindow.setText(outputText);
+         }
+
+         System.out.println("calculationHolder: " + calculationHolder);
+         System.out.println("calculationHolder.size():" + calculationHolder.size());
+         System.out.println("tempHolder: " + tempHolder);
       }
       
       // called if the user enters one of the numbers or operators
@@ -373,10 +379,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
             tempHolder = "";
             outputText = outputText + givenE.getActionCommand();
             outputWindow.setText(outputText);
-            // System.out.println(tempHolder); // debug, tracking state
+            System.out.println(tempHolder); // debug, tracking state
          }
          
-         //System.out.println(calculationHolder); // debug, tracking state
+         System.out.println(calculationHolder); // debug, tracking state
          
       }
    }
