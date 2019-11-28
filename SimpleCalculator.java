@@ -150,25 +150,25 @@ public class SimpleCalculator extends JFrame implements ActionListener
    // The actionListener for this program, responds to user input (press of the calculator buttons)
    public void actionPerformed(ActionEvent e)
    {
-      if (e.getActionCommand() == "C") // clear command used, outputWindow text and all calculation variables reset
+      if (e.getActionCommand().equals("C")) // clear command used, outputWindow text and all calculation variables reset
       {
          actionMethods.actionPerformedClear();
       }  
-      else if (e.getActionCommand() == "=") // equals, performs the calculation, shows results, saves result
+      else if (e.getActionCommand().equals("=")) // equals, performs the calculation, shows results, saves result
       {
          actionMethods.actionPerformedFindResult();
       }
-      else if (e.getActionCommand() == ".") { // adds decimal to number if not already inserted in number
+      else if (e.getActionCommand().equals(".")) { // adds decimal to number if not already inserted in number
          actionMethods.actionPerformedDecimal();
       }
-      else if (e.getActionCommand() == "+/-" && (tempHolder != "")) {
+      else if (e.getActionCommand().equals("+/-") && !(tempHolder.equals(""))) {
          actionMethods.actionPerformedChangeSign(e);
       }
-      else if (((e.getActionCommand() == "x^2") || (e.getActionCommand() == "sqrt(x)")) && // applies one of the given mathematicals if tempHolder not empty
+      else if (((e.getActionCommand().equals("x^2")) || (e.getActionCommand().equals("sqrt(x)"))) && // applies one of the given mathematicals if tempHolder not empty
                 (tempHolder.length() != 0)) {
          actionMethods.actionPerformedFunctionApplied(e);
       }
-      else if (e.getActionCommand() == "Back") {
+      else if (e.getActionCommand().equals("Back")) {
          actionMethods.actionPerformedUndo(e);
       }
       else if (isGivenValOperator(e.getActionCommand()) || isStringNumber(e.getActionCommand())) // operator not yet used or clear has been activated, builds up the valueOne or valueTwo String
@@ -220,10 +220,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
             if (isStringNumber(calculationHolder.get(i))) { // if number, push onto valueStack
                valueStack.push(calculationHolder.get(i));
             }
-            else if (calculationHolder.get(i) == "(") { // if left parenthesis, push to top of operatorStack
+            else if (calculationHolder.get(i).equals("(")) { // if left parenthesis, push to top of operatorStack
                operatorStack.push("(");
             }
-            else if (calculationHolder.get(i) == ")") { // if right parenthesis, evaluate items inside the two parenthesis
+            else if (calculationHolder.get(i).equals(")")) { // if right parenthesis, evaluate items inside the two parenthesis
                while (operatorStack.get(operatorStack.size() - 1) != "(") {
                   operator = operatorStack.pop();
                   valueTwo = Double.parseDouble(valueStack.pop());
@@ -277,13 +277,13 @@ public class SimpleCalculator extends JFrame implements ActionListener
       }
 
       public void actionPerformedFunctionApplied(ActionEvent givenE) { // applies a mathematical function to tempHolder, updates
-         if (givenE.getActionCommand() == "x^2") {                     // output to user to show result of that function, value
+         if (givenE.getActionCommand().equals("x^2")) {                     // output to user to show result of that function, value
             outputText = outputText.substring(0, (outputText.length() - tempHolder.length())); // usable in further calculations
             tempHolder = Double.toString(Math.pow(Double.parseDouble(tempHolder), 2));
             outputText = outputText + tempHolder;
             outputWindow.setText(outputText);
          }
-         else if (givenE.getActionCommand() == "sqrt(x)") {
+         else if (givenE.getActionCommand().equals("sqrt(x)")) {
             outputText = outputText.substring(0, (outputText.length() - tempHolder.length()));
             tempHolder = Double.toString(Math.pow(Double.parseDouble(tempHolder), 0.5));
             outputText = outputText + tempHolder;
@@ -315,7 +315,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
             actionPerformedUndo(givenE);
          }
 
-         if (tempHolder == "" && (calculationHolder.get(calculationHolder.size() - 1).length() != 0) // if next value to remove must be an operator, remove the operator
+         if (tempHolder.equals("") && (calculationHolder.get(calculationHolder.size() - 1).length() != 0) // if next value to remove must be an operator, remove the operator
             && lastVal != "undidOperator") { 
             if (calculationHolder.size() != 0) { // if calculationHolder not empty, remove next operator
                lastVal = "undidOperator"; // set to generic number since operator was removed
@@ -325,14 +325,14 @@ public class SimpleCalculator extends JFrame implements ActionListener
                tempHolder = calculationHolder.get(calculationHolder.size() - 1);
             }
          }
-         else if (isStringNumber(lastVal) || (lastVal == "undidOperator")) { // if the next thing to be undone must be a number, then undo number
+         else if (isStringNumber(lastVal) || (lastVal.equals("undidOperator"))) { // if the next thing to be undone must be a number, then undo number
             System.out.println(0);
             if (tempHolder.length() != 0) {
                tempHolder = tempHolder.substring(0, tempHolder.length() - 1);
                outputText = outputText.substring(0, outputText.length() - 1);
                outputWindow.setText(outputText);
             }
-            else if (calculationHolder.size() != 0 && tempHolder == "") { // if last item in ArrayList calculationHolder is not empty, set that value to be itself minus the last value
+            else if (calculationHolder.size() != 0 && tempHolder.equals("")) { // if last item in ArrayList calculationHolder is not empty, set that value to be itself minus the last value
                System.out.println(2);
                tempHolder = calculationHolder.get(calculationHolder.size() - 1);
                tempHolder = tempHolder.substring(0, tempHolder.length() - 1);
@@ -385,12 +385,12 @@ public class SimpleCalculator extends JFrame implements ActionListener
    // START OF MISC UTILITY FUNCTIONS
 
    public boolean isGivenValOperator (String val) {
-      return ((val == "+") ||
-              (val == "-") ||
-              (val == "*") ||
-              (val == "/") ||
-              (val == "x^2") ||
-              (val == "sqrt(x)"));
+      return ((val.equals("+")) ||
+              (val.equals("-")) ||
+              (val.equals("*")) ||
+              (val.equals("/")) ||
+              (val.equals("x^2")) ||
+              (val.equals("sqrt(x)")));
    }
 
    // Checks is a given String can be converted into a number, returns true if so, false otherwise
@@ -405,16 +405,16 @@ public class SimpleCalculator extends JFrame implements ActionListener
    }
 
    public void applyOperator() {
-      if (operator == "+") { // perform calculation, add calculated value to top of valueStack
+      if (operator.equals("+")) { // perform calculation, add calculated value to top of valueStack
          valueStack.push(Double.toString(valueOne + valueTwo));
       }
-      else if (operator == "-") {
+      else if (operator.equals("-")) {
          valueStack.push(Double.toString(valueOne - valueTwo));
       }
-      else if (operator == "*") {
+      else if (operator.equals("*")) {
          valueStack.push(Double.toString(valueOne * valueTwo));
       }
-      else if (operator == "/") {
+      else if (operator.equals("/")) {
          valueStack.push(Double.toString(valueOne / valueTwo));
       }
    }
@@ -425,35 +425,35 @@ public class SimpleCalculator extends JFrame implements ActionListener
       int firstOpPrecedence = 0;
       int secondOpPrecedence = 0;
 
-      if (firstOperator == "^") {
+      if (firstOperator.equals("^")) {
          firstOpPrecedence = 4;
       }
-      else if (firstOperator == "*") {
+      else if (firstOperator.equals("*")) {
          firstOpPrecedence = 3;
       }
-      else if (firstOperator == "/") {
+      else if (firstOperator.equals("/")) {
          firstOpPrecedence = 3;
       }
-      else if (firstOperator == "+") {
+      else if (firstOperator.equals("+")) {
          firstOpPrecedence = 2;
       }
-      else if (firstOperator == "-") {
+      else if (firstOperator.equals("-")) {
          firstOpPrecedence = 2;
       }
 
-      if (secondOperator == "^") {
+      if (secondOperator.equals("^")) {
          secondOpPrecedence = 4;
       }
-      else if (secondOperator == "*") {
+      else if (secondOperator.equals("*")) {
          secondOpPrecedence = 3;
       }
-      else if (secondOperator == "/") {
+      else if (secondOperator.equals("/")) {
          secondOpPrecedence = 3;
       }
-      else if (secondOperator == "+") {
+      else if (secondOperator.equals("+")) {
          secondOpPrecedence = 2;
       }
-      else if (secondOperator == "-") {
+      else if (secondOperator.equals("-")) {
          secondOpPrecedence = 2;
       }
 
