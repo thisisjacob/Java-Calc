@@ -154,7 +154,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       {
          actionMethods.actionPerformedClear();
       }  
-      else if (e.getActionCommand().equals("=")) // equals, performs the calculation, shows results, saves result
+      else if (e.getActionCommand().equals("=") && (calculationHolder.size() != 0)) // equals, performs the calculation, shows results, saves result
       {
          actionMethods.actionPerformedFindResult();
       }
@@ -321,19 +321,28 @@ public class SimpleCalculator extends JFrame implements ActionListener
             && lastVal != "undidOperator") { 
             System.out.println(1);
             lastVal = "undidOperator"; // set to generic number since operator was removed
-            calculationHolder.remove(calculationHolder.size() - 1);
+            calculationHolder.remove(calculationHolder.size() - 1); // remove operator
             outputText = outputText.substring(0, outputText.length() - 1);
             outputWindow.setText(outputText);
-            tempHolder = calculationHolder.get(calculationHolder.size() - 1);
+            tempHolder = calculationHolder.get(calculationHolder.size() - 1); // set tempHolder to last number in calculationHolder, remove that number from calculationHolder
+            calculationHolder.remove(calculationHolder.size() - 1);
          }
-         else if (tempHolder.length() != 0) {
+         else if (tempHolder.length() != 0) { // if there are values in tempHolder, remove values from tempHolder
             System.out.println(2);
             if (calculationHolder.size() != 0 && tempHolder.equals(calculationHolder.get(calculationHolder.size() - 1))) {
                calculationHolder.set((calculationHolder.size() - 1), calculationHolder.get(calculationHolder.size() - 1).substring(0, calculationHolder.get(calculationHolder.size() - 1).length() - 1));
             }
             tempHolder = tempHolder.substring(0, tempHolder.length() - 1);
-            outputText = outputText.substring(0, outputText.length() - 1);
-            outputWindow.setText(outputText);
+            if (tempHolder.equals("-")) { // if last value is a negative modifier, clear tempHolder and remove from output text
+               tempHolder = "";
+               outputText = outputText.substring(0, outputText.length() - 2);
+               outputWindow.setText(outputText);
+            }
+            else { // otherwise just set output text to itself minus the last value in the String
+               outputText = outputText.substring(0, outputText.length() - 1); 
+               outputWindow.setText(outputText);
+            }
+            
          }
          else if (calculationHolder.size() != 0 && tempHolder.equals("")) { // if last item in ArrayList calculationHolder is not empty, set that value to be itself minus the last value
             System.out.println(3);
