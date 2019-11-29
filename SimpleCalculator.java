@@ -322,10 +322,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
       }
 
       public void actionPerformedUndo(ActionEvent givenE) {
-         System.out.println("begin");
-         System.out.println("calculationHolder: " + calculationHolder);
-         System.out.println("calculationHolder.size():" + calculationHolder.size());
-         System.out.println("tempHolder: " + tempHolder);
          if (calculationHolder.size() != 0 && calculationHolder.get(calculationHolder.size() - 1).length() == 0) { // if next item in calculationHolder ArrayList is empty, remove that item before doing anything else
             calculationHolder.remove(calculationHolder.size() - 1);
          }
@@ -333,7 +329,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
          if (calculationHolder.size() != 0 && tempHolder.equals("") // if next value to remove must be an operator, remove the operator
             && (calculationHolder.get(calculationHolder.size() - 1).length() != 0) 
             && lastVal != "undidOperator") { 
-            System.out.println(1);
             lastVal = "undidOperator"; // set to generic number since operator was removed
             calculationHolder.remove(calculationHolder.size() - 1); // remove operator
             outputText = outputText.substring(0, outputText.length() - 1);
@@ -342,7 +337,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
             calculationHolder.remove(calculationHolder.size() - 1);
          }
          else if (tempHolder.length() != 0) { // if there are values in tempHolder, remove values from tempHolder
-            System.out.println(2);
             if (calculationHolder.size() != 0 && tempHolder.equals(calculationHolder.get(calculationHolder.size() - 1))) {
                calculationHolder.set((calculationHolder.size() - 1), calculationHolder.get(calculationHolder.size() - 1).substring(0, calculationHolder.get(calculationHolder.size() - 1).length() - 1));
             }
@@ -359,7 +353,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
             
          }
          else if (calculationHolder.size() != 0 && tempHolder.equals("")) { // if last item in ArrayList calculationHolder is not empty, set that value to be itself minus the last value
-            System.out.println(3);
             tempHolder = calculationHolder.get(calculationHolder.size() - 1);
             tempHolder = tempHolder.substring(0, tempHolder.length() - 1);
             calculationHolder.remove(calculationHolder.size() - 1);
@@ -367,9 +360,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
             outputWindow.setText(outputText);
          }
 
-         System.out.println("calculationHolder: " + calculationHolder);
-         System.out.println("calculationHolder.size():" + calculationHolder.size());
-         System.out.println("tempHolder: " + tempHolder);
       }
       
       // called if the user enters one of the numbers or operators
@@ -402,10 +392,8 @@ public class SimpleCalculator extends JFrame implements ActionListener
             tempHolder = "";
             outputText = outputText + givenE.getActionCommand();
             outputWindow.setText(outputText);
-            System.out.println(tempHolder); // debug, tracking state
          }
          
-         System.out.println(calculationHolder); // debug, tracking state
          
       }
    }
