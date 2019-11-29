@@ -76,7 +76,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       JButton decimal = new JButton(".");
       JButton switchSign = new JButton("+/-");
       JButton undo = new JButton("Back");
-      JButton n1 = new JButton("n1");
+      JButton reciprocal = new JButton("1/x");
       JButton n2 = new JButton("n2");
       JButton n3 = new JButton("n3");
       
@@ -102,7 +102,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       decimal.addActionListener(this);
       switchSign.addActionListener(this);
       undo.addActionListener(this);
-      n1.addActionListener(this);
+      reciprocal.addActionListener(this);
       n2.addActionListener(this);
       n3.addActionListener(this);
       
@@ -113,7 +113,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       buttonPanel.add(switchSign);
       buttonPanel.add(clear);
       buttonPanel.add(undo);
-      buttonPanel.add(n1);
+      buttonPanel.add(reciprocal);
       buttonPanel.add(n2);
       buttonPanel.add(n3);
       buttonPanel.add(seven);
@@ -164,7 +164,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
       else if (e.getActionCommand().equals("+/-") && !(tempHolder.equals(""))) {
          actionMethods.actionPerformedChangeSign(e);
       }
-      else if (((e.getActionCommand().equals("x^2")) || (e.getActionCommand().equals("sqrt(x)"))) && // applies one of the given mathematicals if tempHolder not empty
+      else if (((e.getActionCommand().equals("x^2")) || (e.getActionCommand().equals("sqrt(x)")) || (e.getActionCommand().equals("1/x"))) && // applies one of the given mathematicals if tempHolder not empty
                 (tempHolder.length() != 0)) {
          actionMethods.actionPerformedFunctionApplied(e);
       }
@@ -277,16 +277,32 @@ public class SimpleCalculator extends JFrame implements ActionListener
       }
 
       public void actionPerformedFunctionApplied(ActionEvent givenE) { // applies a mathematical function to tempHolder, updates
+         System.out.println(1);
          if (givenE.getActionCommand().equals("x^2")) {                     // output to user to show result of that function, value
             outputText = outputText.substring(0, (outputText.length() - tempHolder.length())); // usable in further calculations
             tempHolder = Double.toString(Math.pow(Double.parseDouble(tempHolder), 2));
             outputText = outputText + tempHolder;
             outputWindow.setText(outputText);
          }
-         else if (givenE.getActionCommand().equals("sqrt(x)")) {
+         else if (givenE.getActionCommand().equals("sqrt(x)")) { // apply square root function
             outputText = outputText.substring(0, (outputText.length() - tempHolder.length()));
             tempHolder = Double.toString(Math.pow(Double.parseDouble(tempHolder), 0.5));
             outputText = outputText + tempHolder;
+            outputWindow.setText(outputText);
+         }
+         else if (givenE.getActionCommand().equals("1/x")) {
+            System.out.println(2);
+            int tempHolderOriginalSize = tempHolder.length();
+            if (tempHolderOriginalSize > 2 && tempHolder.substring(0, 2).equals("1/")) {
+               System.out.println(3);
+               tempHolder = tempHolder.substring(2);
+               outputText = outputText.substring(0, outputText.length() - tempHolderOriginalSize) + tempHolder;
+            }
+            else if (!(tempHolder.substring(0, 2).equals("1/"))) {
+               System.out.println(4);
+               tempHolder = "1/" + tempHolder;
+               outputText = outputText.substring(0, outputText.length() - tempHolderOriginalSize) + tempHolder;
+            }
             outputWindow.setText(outputText);
          }
       }
