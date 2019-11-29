@@ -13,7 +13,7 @@ public class SimpleCalculator extends JFrame implements ActionListener
    private static final int WIDTH = 300;
    private static final int HEIGHT = 400;
    
-   private JLabel outputWindow; // JLabel showing the results of calculations, created here so it can be accessed
+   private JTextField outputWindow; // JLabel showing the results of calculations, created here so it can be accessed
    // by the SimpleCalculatorActionPerformedMethods inner class
    
    private String tempHolder = "";
@@ -45,9 +45,10 @@ public class SimpleCalculator extends JFrame implements ActionListener
       calcWindow.setLayout(new BorderLayout());
       
       // outputWindow is the top of the calculator that shows the results of user input
-      outputWindow = new JLabel(Double.toString(0.0), SwingConstants.CENTER);
+      outputWindow = new JTextField(Double.toString(0.0), SwingConstants.CENTER);
       outputWindow.setFont(new Font("Label.font", Font.BOLD, 18));
       outputWindow.setPreferredSize(new Dimension(WIDTH, 80)); 
+      outputWindow.setEditable(false);
       
 
       
@@ -77,8 +78,8 @@ public class SimpleCalculator extends JFrame implements ActionListener
       JButton switchSign = new JButton("+/-");
       JButton undo = new JButton("Back");
       JButton reciprocal = new JButton("1/x");
-      JButton n2 = new JButton("n2");
-      JButton n3 = new JButton("n3");
+      JButton n2 = new JButton(" ");
+      JButton n3 = new JButton(" ");
       
       // attaches actionListeners to all the buttons, interacts with actionPerformed
       sqRoot.addActionListener(this);
@@ -277,7 +278,6 @@ public class SimpleCalculator extends JFrame implements ActionListener
       }
 
       public void actionPerformedFunctionApplied(ActionEvent givenE) { // applies a mathematical function to tempHolder, updates
-         System.out.println(1);
          if (givenE.getActionCommand().equals("x^2")) {                     // output to user to show result of that function, value
             outputText = outputText.substring(0, (outputText.length() - tempHolder.length())); // usable in further calculations
             tempHolder = Double.toString(Math.pow(Double.parseDouble(tempHolder), 2));
@@ -291,18 +291,9 @@ public class SimpleCalculator extends JFrame implements ActionListener
             outputWindow.setText(outputText);
          }
          else if (givenE.getActionCommand().equals("1/x")) {
-            System.out.println(2);
             int tempHolderOriginalSize = tempHolder.length();
-            if (tempHolderOriginalSize > 2 && tempHolder.substring(0, 2).equals("1/")) {
-               System.out.println(3);
-               tempHolder = tempHolder.substring(2);
-               outputText = outputText.substring(0, outputText.length() - tempHolderOriginalSize) + tempHolder;
-            }
-            else if (!(tempHolder.substring(0, 2).equals("1/"))) {
-               System.out.println(4);
-               tempHolder = "1/" + tempHolder;
-               outputText = outputText.substring(0, outputText.length() - tempHolderOriginalSize) + tempHolder;
-            }
+            tempHolder = Double.toString(1 / Double.parseDouble(tempHolder));
+            outputText = outputText.substring(0, outputText.length() - tempHolderOriginalSize) + tempHolder;
             outputWindow.setText(outputText);
          }
       }
